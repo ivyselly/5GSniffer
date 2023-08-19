@@ -22,6 +22,10 @@
 #include <spdlog/spdlog.h>
 #include "sdr.h"
 #include "exceptions.h"
+#include "set_usrp_parameters.h"
+#include <uhd/usrp/multi_usrp.hpp>
+#include <uhd/stream.hpp>
+#include "config.h"
 
 /** 
  * Constructor for sdr.
@@ -34,9 +38,11 @@
 sdr::sdr(
   double sample_rate,
   double frequency,
+  uhd::usrp::multi_usrp::sptr usrp,
   double rx_gain,
   double tx_gain
-) : sample_rate(sample_rate),
+) : usrp(usrp),
+    sample_rate(sample_rate),
     frequency(frequency),
     rx_gain(rx_gain),
     tx_gain(tx_gain) {

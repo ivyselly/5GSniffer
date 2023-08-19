@@ -27,6 +27,8 @@
 #include "sniffer.h"
 #include "exceptions.h"
 #include "config.h"
+#include "set_usrp_parameters.h"
+#include "sdr.h"
 
 using namespace std;
 extern struct config config;
@@ -41,6 +43,7 @@ static void usage() {
  * @param argc 
  * @param argv 
  */
+
 int main(int argc, char** argv) {
   string config_path;
 
@@ -67,14 +70,24 @@ int main(int argc, char** argv) {
 
   try {
     // Load the config
-    config = config::load(config_path);
+   struct config cfg = config::load(config_path);
+   cout << "Loaded config file_path: " << cfg.file_path << endl;
+   
+   cfg.device_args += ",name=MyB210";
 
     // Create sniffer
-    if(config.file_path.compare("") == 0) {
-      sniffer sniffer(config.sample_rate, config.frequency);
+    if(cfg.file_path.compare("") == 0) {
+    
+    uhd::usrp::multi_usrp::sptr usrp = uhd::usrp::multi_usrp::make(cfg.device_args);
+    
+    set_usrp_parameters(usrp, cfg);
+
+     sdr sdr_instance(cfg.sample_rate, cfg.frequency, usrp);
+      sniffer sniffer(cfg.sample_rate, cfg.frequency,usrp);
       sniffer.start();  
     } else {
-      sniffer sniffer(config.sample_rate, config.file_path.data());
+    cout << "Creating sniffer with file source..." << endl;
+      sniffer sniffer(cfg.sample_rate, cfg.file_path.data());
       sniffer.start();
     }
   } catch (sniffer_exception& e) {

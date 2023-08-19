@@ -28,6 +28,7 @@
 #include "phy_params_common.h"
 #include "utils.h"
 #include <memory>
+#include <uhd/usrp/multi_usrp.hpp>
 
 using namespace std;
 
@@ -37,9 +38,9 @@ using namespace std;
  * @param sample_rate
  * @param frequency
  */
-sniffer::sniffer(uint64_t sample_rate, uint64_t frequency) :
+sniffer::sniffer(uint64_t sample_rate, uint64_t frequency,uhd::usrp::multi_usrp::sptr usrp) :
   sample_rate(sample_rate),
-  device(make_unique<sdr>(sample_rate, frequency)) {
+  device(make_unique<sdr>(sample_rate, frequency,usrp)) {
   init();
 }
 
